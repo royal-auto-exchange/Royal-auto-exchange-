@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Auto Exchange</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#10131b;color:white;font-family:Arial,sans-serif}
+header{background:#171d29;padding:20px;text-align:center;border-bottom:2px solid #d6a943}
+.logo{font-size:25px;font-weight:bold;color:#f4c45e}
+header p{color:#bbb;margin:8px 0 0}
+nav{display:flex;justify-content:center;gap:20px;padding:15px;background:#202736;flex-wrap:wrap}
+nav a{color:white;text-decoration:none}
+.hero{text-align:center;padding:45px 15px;background:linear-gradient(135deg,#202b3b,#11131a)}
+.hero h1{color:#f4c45e;font-size:30px}
+.hero p{color:#ddd}
+button{background:#d9aa43;color:#171717;border:0;padding:12px 18px;border-radius:7px;font-weight:bold;cursor:pointer}
+.search{padding:20px;max-width:650px;margin:auto}
+input,select,textarea{width:100%;padding:13px;margin:7px 0;background:#222b3a;border:1px solid #485064;border-radius:7px;color:white}
+h2{text-align:center;color:#f4c45e}
+.categories{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:10px}
+.categories button{background:#283447;color:white}
+.listings{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;padding:20px;max-width:1000px;margin:auto}
+.card{background:#202736;border:1px solid #394254;border-radius:12px;padding:18px}
+.card h3{color:#f4c45e}
+.price{font-size:20px;color:#71e6a1;font-weight:bold}
+section{padding:20px}
+.formbox{max-width:550px;margin:auto;background:#202736;padding:20px;border-radius:12px}
+footer{text-align:center;background:#080a0f;padding:25px;color:#aaa}
+.small{font-size:12px;color:#aaa}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">👑 ROYAL AUTO EXCHANGE</div>
+<p>Buy • Sell • Exchange Your Vehicles</p>
+</header>
+
+<nav>
+<a href="#home">Home</a>
+<a href="#vehicles">Vehicles</a>
+<a href="#sell">Sell Vehicle</a>
+<a href="#premium">Premium</a>
+</nav>
+
+<div class="hero" id="home">
+<h1>Find Your Dream Vehicle</h1>
+<p>Buy and Sell Bikes & Cars in One Place</p>
+<a href="#vehicles"><button>Explore Vehicles</button></a>
+</div>
+
+<div class="search">
+<input id="search" placeholder="Search Bike, Car or Brand..." oninput="showVehicles()">
+</div>
+
+<h2>Choose Your Vehicle</h2>
+<div class="categories">
+<button onclick="filterType('All')">All</button>
+<button onclick="filterType('Bike')">Bikes</button>
+<button onclick="filterType('Car')">Cars</button>
+</div>
+
+<section id="vehicles">
+<h2>Latest Listings</h2>
+<div class="listings" id="vehicleList">
+<div class="card">
+<h3>Royal Auto Exchange</h3>
+<p>Welcome! Be the first to list your vehicle.</p>
+</div>
+</div>
+</section>
+
+<section id="sell">
+<h2>Sell Your Vehicle</h2>
+<div class="formbox">
+<form id="sellForm">
+<input id="vehicleName" placeholder="Vehicle Name / Model" required>
+<select id="vehicleType">
+<option value="Bike">Bike</option>
+<option value="Car">Car</option>
+</select>
+<input id="vehiclePrice" type="number" placeholder="Expected Price (₹)" required>
+<input id="vehicleYear" placeholder="Manufacturing Year">
+<input id="vehicleCity" placeholder="Your City" required>
+<textarea id="vehicleDetails" placeholder="Vehicle Details"></textarea>
+<button type="submit">Submit Listing</button>
+</form>
+<p class="small">Demo version: listings are saved only in this browser.</p>
+</div>
+</section>
+
+<section id="premium">
+<h2>Royal Premium Membership</h2>
+<div class="formbox" style="text-align:center">
+<h3>👑 Become a Premium Member</h3>
+<p>Get special visibility for your vehicle listings.</p>
+<p class="price">Membership plans coming soon</p>
+<button onclick="alert('Premium membership payment will be activated after secure payment setup.')">Explore Premium</button>
+</div>
+</section>
+
+<footer>
+<h3>ROYAL AUTO EXCHANGE</h3>
+<p>Your Trusted Vehicle Marketplace</p>
+<p>© 2026 Royal Auto Exchange</p>
+</footer>
+
+<script>
+let vehicles = JSON.parse(localStorage.getItem('royalVehicles') || '[]');
+let selectedType = 'All';
+
+function showVehicles(){
+const query = document.getElementById('search').value.toLowerCase();
+const filtered = vehicles.filter(v =>
+(selectedType === 'All' || v.type === selectedType) &&
+(v.name.toLowerCase().includes(query) || v.city.toLowerCase().includes(query))
+);
+const list = document.getElementById('vehicleList');
+list.innerHTML = '';
+if(filtered.length === 0){
+list.innerHTML = '<p>No vehicles found. Be the first to add a listing!</p>';
+return;
+}
+filtered.forEach(v=>{
+list.innerHTML += `<div class="card">
+<h3>${escapeText(v.name)}</h3>
+<p>${escapeText(v.type)} | ${escapeText(v.year)}</p>
+<p>📍 ${escapeText(v.city)}</p>
+<p class="price">₹${Number(v.price).toLocaleString('en-IN')}</p>
+<p>${escapeText(v.details)}</p>
+</div>`;
+});
+}
+
+function filterType(type){
+selectedType = type;
+showVehicles();
+}
+
+function escapeText(value){
+return String(value || '').replace(/[&<>"']/g, c => ({
+'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[c]));
+}
+
+document.getElementById('sellForm').addEventListener('submit',function(e){
+e.preventDefault();
+vehicles.push({
+name:document.getElementById('vehicleName').value,
+type:document.getElementById('vehicleType').value,
+price:document.getElementById('vehiclePrice').value,
+year:document.getElementById('vehicleYear').value,
+city:document.getElementById('vehicleCity').value,
+details:document.getElementById('vehicleDetails').value
+});
+localStorage.setItem('royalVehicles',JSON.stringify(vehicles));
+this.reset();
+showVehicles();
+alert('Your demo listing has been added!');
+});
+showVehicles();
+</script>
+</body>
+</html>
